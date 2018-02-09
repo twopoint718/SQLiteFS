@@ -8,6 +8,7 @@
 
 #ifndef database_h
 bool get_table_names(char*, char* [], size_t);
+bool get_table_content(const char *, const char *, char **);
 #define database_h
 
 

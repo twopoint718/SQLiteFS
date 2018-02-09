@@ -12,3 +12,6 @@ ENFLAGS = \
 
 all: database.c filesystem.c
 	gcc filesystem.c database.c -o hello ${LDFLAGS} ${HEADERS} ${DYNLIBS} ${ENFLAGS}
+
+clean:
+	rm hello

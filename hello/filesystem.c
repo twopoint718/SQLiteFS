@@ -7,10 +7,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "database.h"
+#include <stdlib.h>
 
-//static const char  *file_path      = "/hello.txt";
-//static const char   file_content[] = "Hello World!\n";
-//static const size_t file_size      = sizeof(file_content)/sizeof(char) - 1;
 static const int num_tables = 3;
 static char *table_names[num_tables];
 
@@ -87,15 +85,11 @@ hello_read(const char *path, char *buf, size_t size, off_t offset,
 	if (unknown_file)
 		return -ENOENT;
 	
-	if (offset >= 0) /* Trying to read past the end of file. */
-		return 0;
-	
-	if (offset + size > 0) /* Trim the read to the file size. */
-		size = 0;
-	
-	memcpy(buf, "", 0); /* Provide the content. */
-	
-	return (int)size;
+	char *content = malloc(1);
+	get_table_content("/Users/chris/test.db", path, &content);
+	memcpy(buf, content, 0); /* Provide the content. */
+	fi->flags = O_RDONLY;
+	return (int)strlen(content);
 }
 
 static struct fuse_operations hello_filesystem_operations = {
@@ -110,7 +104,7 @@ main(int argc, char **argv)
 {
 	if (get_table_names("/Users/chris/test.db", table_names, num_tables))
 	{
-		printf("GOT TABLE NAMES\n");
+		printf("FILESYSTEM MOUNTED\n");
 		return fuse_main(argc, argv, &hello_filesystem_operations, NULL);
 	}
 	else
