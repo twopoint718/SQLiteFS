@@ -102,14 +102,17 @@ static struct fuse_operations hello_filesystem_operations = {
 int
 main(int argc, char **argv)
 {
-	if (get_table_names("/Users/chris/test.db", table_names, num_tables))
-	{
-		printf("FILESYSTEM MOUNTED\n");
-		return fuse_main(argc, argv, &hello_filesystem_operations, NULL);
-	}
-	else
-	{
-		printf("ERROR: while listing table names\n");
-		return 1;
-	}
+	char *contents = malloc(50);
+	get_table_content("/Users/chris/test.db", "artists", &contents);
+	printf("%s", contents);
+//	if (get_table_names("/Users/chris/test.db", table_names, num_tables))
+//	{
+//		printf("FILESYSTEM MOUNTED\n");
+//		return fuse_main(argc, argv, &hello_filesystem_operations, NULL);
+//	}
+//	else
+//	{
+//		printf("ERROR: while listing table names\n");
+//		return 1;
+//	}
 }

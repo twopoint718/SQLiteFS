@@ -80,23 +80,51 @@ get_table_names(char *dbname, char *table_names[], size_t max_tables)
 }
 
 static int
-read_table_callback(void *_contents, int argc, char **argv, char **azColName)
+read_table_callback(char **contents, int argc, char **argv, char **azColName)
 {
+	char *start;
+	char *end;
+	
+	// print the header row before any of the content
+	if (strlen(*contents) == 0)
+	{
+		int i;
+		int header_size = 2 + (argc - 1);
+		for (i = 0; i < argc; i++)
+			header_size = header_size + sizeof(azColName[i]);
+		end = malloc(1 + header_size);
+		start = end;
+		for (i = 0; i < argc; i++)
+		{
+			end = stpcpy(end, azColName[i]);
+			if (i < argc - 1)
+				end = stpcpy(end, ",");
+		}
+		*contents = start;
+	}
+
 	// measure the size of this row, plus the eventual comma separators
 	// foo,bar,baz\n\0
 	// = (2 + 2) + 3 + 3 + 3
 	// = (argc - 1) + 2 + sum(sizeof(argv[i]))
-	int row_size = 2 + (argc - 1);              // newline, null, separators
+	int row_size = 2 + (argc - 1);
 	for (int i=0; i < argc; i++)
 		row_size = row_size + sizeof(argv[i]);
 	
 	// allocate new total size to accomodate incoming row & copy it in.
-	char *contents = realloc(_contents, strlen(contents) + row_size);
-	char *end = contents;
+	end = malloc(strlen(*contents) + 1 + row_size);
+	start = end;
+	
+	end = stpcpy(end, *contents);
+	end = stpcpy(end, "\n");
+	
 	for (int i=0; i<argc; i++)
 	{
 		end = stpcpy(end, argv[i]);
+		if (i < argc - 1)
+			end = stpcpy(end, ",");
 	}
+	*contents = start;
 	return 0;
 }
 
