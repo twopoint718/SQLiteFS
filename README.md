@@ -1,4 +1,4 @@
-# BORGES
+# BORGES (aka SQLiteFS)
 
 > You who read me, are You sure of understanding my language?  
 > -- Jorge Luis Borges "The Library of Babel"
