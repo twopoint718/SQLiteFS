@@ -8,14 +8,15 @@
 #include <stdbool.h>
 #include "database.h"
 #include <stdlib.h>
+#include <unistd.h>
 
 static const int num_tables = 3;
 static char *table_names[num_tables];
 
 static int
-hello_getattr(const char *path, struct stat *stbuf)
+borges_getattr(const char *path, struct stat *stbuf)
 {
-	printf("CALLED hello_getattr\n");
+	printf("CALLED borges_getattr\n");
 	memset(stbuf, 0, sizeof(struct stat));
 	
 	if (strcmp(path, "/") == 0)
@@ -40,7 +41,7 @@ hello_getattr(const char *path, struct stat *stbuf)
 }
 
 static int
-hello_open(const char *path, struct fuse_file_info *fi)
+borges_open(const char *path, struct fuse_file_info *fi)
 {
 	for (int i = 0; i < num_tables; i++)
 	{
@@ -54,10 +55,10 @@ hello_open(const char *path, struct fuse_file_info *fi)
 }
 
 static int
-hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
+borges_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 			  off_t offset, struct fuse_file_info *fi)
 {
-	printf("CALLED hello_readdir\n");
+	printf("CALLED borges_readdir\n");
 	if (strcmp(path, "/") != 0) /* We only recognize the root directory. */
 		return -ENOENT;
 	
@@ -73,8 +74,8 @@ hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 }
 
 static int
-hello_read(const char *path, char *buf, size_t size, off_t offset,
-		   struct fuse_file_info *fi)
+borges_read(const char *path, char *buf, size_t size, off_t offset,
+			struct fuse_file_info *fi)
 {
 	bool unknown_file = true;
 	for (int i = 0; i < num_tables; i++)
@@ -92,27 +93,42 @@ hello_read(const char *path, char *buf, size_t size, off_t offset,
 	return (int)strlen(content);
 }
 
-static struct fuse_operations hello_filesystem_operations = {
-	.getattr = hello_getattr, /* To provide size, permissions, etc. */
-	.open    = hello_open,    /* To enforce read-only access.       */
-	.read    = hello_read,    /* To provide file content.           */
-	.readdir = hello_readdir, /* To provide directory listing.      */
+static struct fuse_operations borges_filesystem_operations = {
+	.getattr = borges_getattr, /* To provide size, permissions, etc. */
+	.open    = borges_open,    /* To enforce read-only access.       */
+	.read    = borges_read,    /* To provide file content.           */
+	.readdir = borges_readdir /* To provide directory listing.      */
 };
 
 int
 main(int argc, char **argv)
 {
-	char *contents = malloc(50);
-	get_table_content("/Users/chris/test.db", "artists", &contents);
-	printf("%s", contents);
-//	if (get_table_names("/Users/chris/test.db", table_names, num_tables))
-//	{
-//		printf("FILESYSTEM MOUNTED\n");
-//		return fuse_main(argc, argv, &hello_filesystem_operations, NULL);
-//	}
-//	else
-//	{
-//		printf("ERROR: while listing table names\n");
-//		return 1;
-//	}
+	if (argc != 3)
+	{
+		fprintf(stderr, "USAGE:\n\t%s DBFILE MOUNT_POINT\n", argv[0]);
+		exit(1);
+	}
+
+	int is_accessible = access(argv[1], 4);
+	if (is_accessible == 0)
+	{
+		fprintf(stderr, "FILESYSTEM MOUNTED\n");
+		get_table_names(argv[1], table_names, MAX_NUMBER_OF_TABLES);
+
+		char *contents = NULL;
+		for (int i = 0; i < sizeof(table_names)/sizeof(table_names[0]); i++)
+		{
+			printf("=======\n%s\n=======\n", table_names[i]);
+			get_table_content(argv[1], table_names[i], &contents);
+			printf("%s\n\n", contents);
+			contents = NULL;
+		}
+		//return fuse_main(argc, argv, &borges_filesystem_operations, NULL);
+		return 0;
+	}
+	else
+	{
+		fprintf(stderr, "ERROR: database not accessible\n");
+		return 1;
+	}
 }

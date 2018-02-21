@@ -11,7 +11,10 @@ ENFLAGS = \
 	-DFUSE_USE_VERSION=26
 
 all: database.c filesystem.c
-	gcc filesystem.c database.c -o hello ${LDFLAGS} ${HEADERS} ${DYNLIBS} ${ENFLAGS}
+	gcc filesystem.c database.c -o borges ${LDFLAGS} ${HEADERS} ${DYNLIBS} ${ENFLAGS}
+
+debug: database.c filesystem.c
+	gcc filesystem.c database.c -g -o borges ${LDFLAGS} ${HEADERS} ${DYNLIBS} ${ENFLAGS}
 
 clean:
-	rm hello
+	rm borges

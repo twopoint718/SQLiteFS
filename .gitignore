@@ -1,2 +1,7 @@
 hello.xcodeproj
 hello/hello
+.vscode
+doxconfig
+*.dSYM
+tags
+borges

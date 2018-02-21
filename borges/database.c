@@ -5,18 +5,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
-
-/** For simplicity we cap the number of tables here */
-#define MAX_NUMBER_OF_TABLES 50
-
-/**
- * The max number of characters in a table name - nobody wants to look at a
- * super long filename.
- */
-#define MAX_TABLE_NAME 50
+#include "database.h"
 
 static bool
-open_db(char *dbname, sqlite3 **db)
+open_db(const char *dbname, sqlite3 **db)
 {
 	int rc = sqlite3_open(dbname, db);
 	if( rc )
@@ -86,7 +78,7 @@ read_table_callback(char **contents, int argc, char **argv, char **azColName)
 	char *end;
 	
 	// print the header row before any of the content
-	if (strlen(*contents) == 0)
+	if (!(*contents)) /* contents is null */
 	{
 		int i;
 		int header_size = 2 + (argc - 1);
@@ -132,7 +124,7 @@ read_table_callback(char **contents, int argc, char **argv, char **azColName)
  * Read the contents of table.
  */
 bool
-get_table_content(char *dbname, const char *table_name, char **result)
+get_table_content(const char *dbname, const char *table_name, char **result)
 {
 	sqlite3 *db;
 	char *errMsg;
