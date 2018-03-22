@@ -103,7 +103,7 @@ read_table_callback(char **contents, int argc, char **argv, char **azColName)
 	for (int i=0; i < argc; i++)
 		row_size = row_size + sizeof(argv[i]);
 	
-	// allocate new total size to accomodate incoming row & copy it in.
+	// allocate new total size to accommodate incoming row & copy it in.
 	end = malloc(strlen(*contents) + 1 + row_size);
 	start = end;
 	

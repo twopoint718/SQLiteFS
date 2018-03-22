@@ -1,6 +1,6 @@
 //
 //  database.h
-//  borges/sqlitefs
+//  sqlitefs/sqlitefs
 //
 //  Created by Chris Wilson on 2/8/18.
 //  Copyright © 2018 Chris Wilson. All rights reserved.

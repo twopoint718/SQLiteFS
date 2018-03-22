@@ -1,4 +1,5 @@
 LDFLAGS = -losxfuse -lsqlite3
+CCFLAGS = -Wall
 HEADERS = \
 	-I/usr/local/include/osxfuse/fuse \
 	-I/usr/local/Cellar/sqlite/3.21.0/include
@@ -11,10 +12,11 @@ ENFLAGS = \
 	-DFUSE_USE_VERSION=26
 
 all: database.c filesystem.c
-	gcc filesystem.c database.c -o borges ${LDFLAGS} ${HEADERS} ${DYNLIBS} ${ENFLAGS}
+	gcc filesystem.c database.c -o sqlitefs ${CCFLAGS} ${LDFLAGS} ${HEADERS} ${DYNLIBS} ${ENFLAGS}
 
 debug: database.c filesystem.c
-	gcc filesystem.c database.c -g -o borges ${LDFLAGS} ${HEADERS} ${DYNLIBS} ${ENFLAGS}
+	gcc filesystem.c database.c -g -o sqlitefs ${CCFLAGS} ${LDFLAGS} ${HEADERS} ${DYNLIBS} ${ENFLAGS}
 
 clean:
-	rm borges
+	rm sqlitefs
+	rm -rf sqlitefs.dSYM
