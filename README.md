@@ -1,7 +1,7 @@
 # SQLiteFS
 
 > You who read me, are You sure of understanding my language?  
-> -- Jorge Luis sqlitefs "The Library of Babel"
+> -- Jorge Luis Borges "The Library of Babel"
 
 ## About
 
